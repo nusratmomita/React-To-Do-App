@@ -39,7 +39,7 @@ const MyTasks = () => {
       return;
     }
 
-    else if(newTask.deadline<newTask.createdAt){
+    else if(newTask.deadline < newTask.createdAt){
       toast.error("Deadline must be in the future");
       return;
     }
@@ -58,9 +58,10 @@ const MyTasks = () => {
   useEffect(()=>{
     const storedTasks = getTaskFromLS();
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAllTasks(storedTasks);
 
-    console.log(storedTasks)
+    // console.log(storedTasks)
   },[])
 
   return (
@@ -89,7 +90,7 @@ const MyTasks = () => {
           <tbody>
             {allTasks.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center">No tasks found</td>
+                <td colSpan="6" className="text-center">No Tasks Found</td>
               </tr>
             ) : (
               allTasks.map((task,index) => (
