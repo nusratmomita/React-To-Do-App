@@ -19,8 +19,8 @@ export const Header = () => {
             </div>
             <a className="btn btn-ghost text-2xl text-amber-100 hover:bg-transparent">TaskMaster</a>
         </div>
-        <div className="navbar-center hidden lg:flex">
-            <ul className="menu menu-horizontal -ml-20">
+        <div className="navbar-end hidden lg:flex">
+            <ul className="menu menu-horizontal ">
                 <li className='text-xl text-yellow-100'>
                     <NavLink className="hover:bg-transparent border-b-2 border-amber-100" to="/">My Tasks</NavLink>
                 </li>

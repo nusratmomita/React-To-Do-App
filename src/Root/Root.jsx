@@ -5,7 +5,7 @@ import Header from '../Components/header'
 
 const Root = () => {
   return (
-    <div>
+    <div className='max-w-7xl mx-auto'>
         <Header></Header>
         <Outlet></Outlet>
         {/* <Footer></Footer> */}
