@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router';
+import siteLogo from '../../public/to-doIcon.png'
 
 export const Header = () => {
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-100 shadow-sm px-5">
         <div className="navbar-start">
             <div className="dropdown">
                 <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -17,7 +18,10 @@ export const Header = () => {
                     </li>
                 </ul>
             </div>
-            <a className="btn btn-ghost text-2xl text-amber-100 hover:bg-transparent">TaskMaster</a>
+            <div>
+                <img className='w-12 h-12' src={siteLogo} alt="siteLogo" />
+            </div>
+            <a href="#" className="text-2xl text-amber-100 hover:bg-transparent lobster-two-regular">Task-Mastrr</a>
         </div>
         <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal ">

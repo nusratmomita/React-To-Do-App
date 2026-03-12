@@ -141,17 +141,17 @@ const MyTasks = () => {
 
   }
 
+
   return (
     <div>
       <div className='flex justify-between items-center mt-10'>
-        <h3 className="ml-5 text-amber-100 text-2xl font-bold">My Tasks: {allTasks.length}</h3>
+        <h3 className=" text-amber-100 text-2xl font-bold">My Tasks: {allTasks.length}</h3>
         <div onClick={()=>document.getElementById('createTask').showModal()}
-        className='flex items-center gap-2 border-2 border-amber-100 rounded-xl p-3 text-amber-100 font-medium hover:bg-yellow-100 hover:text-black cursor-pointer transition-all duration-200 mx-3'>
+          className='flex items-center gap-2 border-2 border-amber-100 rounded-xl p-3 text-amber-100 font-medium hover:bg-yellow-100 hover:text-black cursor-pointer transition-all duration-200 mx-3'>
           <h4>Add Task</h4>
           <FaPlus></FaPlus>
         </div>
       </div>
-
       {/* showing all the tasks */}
       {
         allTasks.length===0 ?
@@ -160,7 +160,7 @@ const MyTasks = () => {
         </>
         :
         <>
-          <div className='overflow-x-auto mx-5'>
+          <div className='overflow-x-auto mx-5 lg:mx-0'>
               <table className="table w-full table-zebra mt-15 border border-gray-50 rounded-sm p-5">
             <thead>
               <tr>
@@ -178,7 +178,15 @@ const MyTasks = () => {
                   <tr key={task.id}>
                     <td className='text-lg text-center'>{index+1}</td>
                     <td className='text-lg text-center whitespace-nowrap'>{task.taskName}</td>
-                    <td className='text-lg capitalize text-center whitespace-nowrap'>{task.priority}</td>
+                    <td className='text-lg text-center whitespace-nowrap capitalize'>
+                    <span className={`px-3 py-1 border rounded-2xl
+                        ${task.priority === "high" && "text-green-700 border-green-700 bg-green-200"}
+                        ${task.priority === "medium" && "text-yellow-700 border-yellow-700 bg-yellow-200"}
+                        ${task.priority === "low" && "text-red-700 border-red-700 bg-red-200"}
+                      `}>
+                        {task.priority}
+                    </span>
+                    </td>
                     <td className='text-lg text-center whitespace-nowrap'>{task.deadline}</td>
                     <td className='text-lg text-center'>{task.createdAt}</td>
                     <td className="text-lg flex gap-2 justify-center items-center">
