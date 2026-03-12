@@ -5,6 +5,7 @@ import { addTaskToLS, getTaskFromLS, removeTaskFromLS } from '../Utilities/Local
 import { FiEdit2 } from "react-icons/fi";
 import { IoTrashBinOutline } from "react-icons/io5";
 import Swal from 'sweetalert2';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 
 const MyTasks = () => {
 
@@ -13,58 +14,6 @@ const MyTasks = () => {
 
   // to update a task
   const [updatingTask,setUpdatingTask] = useState(null);
-
-  const handleCreateTask = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-
-    const taskName = form.taskName.value;
-    const taskPriority = form.taskPriority.value;
-    const taskDeadline = form.taskDeadline.value;
-
-    // console.log(taskName,taskPriority,taskDeadline);
-
-    if(taskName === '' || taskPriority === '' || taskDeadline === ''){
-      toast.error("You must fill all the fields to create a new tasks.");
-      return;
-    }
-
-    const createdAt = new Date().toISOString().split("T")[0];
-
-    const deadlineDate = new Date(taskDeadline);
-    const createdDate = new Date(createdAt);
-
-    if (deadlineDate < createdDate) {
-      toast.error("Deadline must be in the future");
-      return;
-    }
-
-    const newTask = {
-      id: Date.now(),
-      taskName,
-      priority: taskPriority,
-      deadline: taskDeadline,
-      createdAt: new Date().toISOString().split("T")[0]
-    }
-
-    const addedTask = addTaskToLS(newTask);
-
-    if(!addedTask){
-      toast.error("You already added this Task");
-      return;
-    }
-
-    else{
-      setAllTasks(addedTask);
-      toast.success("You successfully created a new Task!");
-    }
-
-    form.reset();
-
-    document.getElementById("createTask").close();
-
-  }
 
   useEffect(()=>{
     const storedTasks = getTaskFromLS();
@@ -78,41 +27,6 @@ const MyTasks = () => {
   const openUpdateModal = (task) => {
     setUpdatingTask(task);
     document.getElementById('updateTask').showModal();
-  }
-
-  const handleUpdateTask = (e) => {
-    e.preventDefault();
-
-    const form = e.target;
-
-    const updateTaskName = form.taskName.value;
-    const updateTaskPriority = form.taskPriority.value;
-    const updateTaskDeadline = form.taskDeadline.value;
-
-    if(updateTaskName === updatingTask.taskName && updateTaskPriority === updatingTask.priority && updateTaskDeadline === updatingTask.deadline){
-      toast.info("No changes were made.");
-      document.getElementById('updateTask').close();
-      return;
-    }
-
-    else{
-      const updatedTask = allTasks.map((task)=> task.id === updatingTask.id ? 
-        {
-          ...task,
-          taskName: updateTaskName,
-          priority: updateTaskPriority,
-          deadline: updateTaskDeadline
-        } :
-        task
-    )
-  
-    localStorage.setItem('Tasks' , JSON.stringify(updatedTask));
-    setAllTasks(updatedTask);
-  
-    toast.success("Successfully updated the task!");
-  
-    document.getElementById('updateTask').close();
-    }
   }
 
   const handleDelete = (id) => {
@@ -134,7 +48,6 @@ const MyTasks = () => {
         });
         const updatedTask = removeTaskFromLS(id);
         setAllTasks(updatedTask);
-        toast.success("You've successfully deleted the task!")
       }
     });
 
@@ -218,32 +131,119 @@ const MyTasks = () => {
       <dialog id="createTask" className="modal">
         <div className="modal-box">
           <div className="modal-action justify-start"> 
-            <form onSubmit={handleCreateTask} className='space-y-7 w-full'>
-              <label htmlFor="taskName" className='text-yellow-100 text-2xl font-bold'>Task Name</label> 
-              <br /> 
-              <input className='mt-5 p-5 input input-bordered w-full' type="text" name="taskName" id="taskName" placeholder='Enter your task' /> 
-              
-              <div className='flex flex-col space-y-7'> 
-                <label className='whitespace-nowrap mr-5 text-yellow-100 text-2xl font-bold' htmlFor="taskPriority">Task Priority</label> 
-                <select className='select select-bordered w-full' name="taskPriority" id="taskPriority"> 
+            <Formik initialValues={{
+              taskName: "",
+              taskPriority: "",
+              taskDeadline: ""
+            }}
 
-                  <option value="">Select priority</option>
-                  <option value="low">Low</option> 
-                  <option value="medium">Medium</option> 
-                  <option value="high">High</option> 
+            validate={(values)=>{
+              const errors = {};
 
-                </select> 
-                <label className='whitespace-nowrap mr-5 text-yellow-100 text-2xl font-bold' htmlFor="taskDeadline">Task Deadline</label> 
-                <input className='input input-bordered w-full' type="date" name="taskDeadline" id="taskDeadline" placeholder='Enter task deadline' /> 
-              </div> 
-              
-              <div className='modal-action flex items-center justify-between gap-2 mt-5'>
-                <button type="submit" className="btn bg-yellow-100 text-black w-[50%]"> Add Task </button>
-                
-                <button className="btn bg-black/50 w-[50%]" type="button"
-                onClick={() => document.getElementById("createTask").close()}>Close</button>
+              if(!values.taskName){
+                errors.taskName = "Task name is necessary"
+              }
+
+              if(!values.taskPriority){
+                errors.taskPriority = "Task priority is necessary"
+              }
+
+              if(!values.taskDeadline){
+                errors.taskDeadline = "Task Deadline is nessacary"
+              }
+
+              return errors;
+            }}
+
+            onSubmit={(values, {resetForm})=>{
+
+              const createdAt = new Date().toISOString().split("T")[0];
+
+              const deadlineDate = new Date(values.taskDeadline);
+              const createdDate = new Date(createdAt);
+
+              if (deadlineDate < createdDate) {
+                toast.error("Deadline must be in the future");
+                return;
+              }
+
+              const newTask = {
+                id: Date.now(),
+                taskName: values.taskName,
+                priority: values.taskPriority,
+                deadline: values.taskDeadline,
+                createdAt: new Date().toISOString().split("T")[0]
+              }
+
+              const addedTask = addTaskToLS(newTask);
+
+              if(!addedTask){
+                toast.error("You already added this Task");
+                return;
+              }
+
+              else{
+                setAllTasks(addedTask);
+                toast.success("You successfully created a new Task!");
+              }
+
+             resetForm()
+
+              document.getElementById("createTask").close();
+            }}
+            >
+
+            <Form className="space-y-7 w-full">
+              <label className="text-yellow-100 text-2xl font-bold">Task Name</label>
+              <Field
+                name="taskName"
+                type="text"
+                placeholder="Enter your task"
+                className="input input-bordered w-full mt-3"
+              >
+              </Field>
+
+              <ErrorMessage name="taskName" component="div" className="text-red-500 -mt-5"/>
+
+              <label className="text-yellow-100 text-2xl font-bold">Task Priority</label>
+              <Field
+                name="taskPriority"
+                as="select"
+                className="select select-bordered w-full mt-3"
+              >
+                <option value="">Select Priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </Field>
+
+              <ErrorMessage name="taskPriority" component="div" className="text-red-500 -mt-5"/>
+
+              <label className="text-yellow-100 text-2xl font-bold">Task Deadline</label>
+              <Field
+                name="taskDeadline"
+                type="date"
+                className="input input-bordered w-full mt-3"
+              >
+              </Field>
+
+              <ErrorMessage name="taskDeadline" component="div" className="text-red-500 -mt-5"/>
+
+              <div className="modal-action flex gap-2">
+
+                <button type="submit" className="btn bg-yellow-100 text-black w-[50%]">Add Task</button>
+
+                <button
+                  type="button"
+                  className="btn bg-yellow-100 text-black w-[50%]"
+                  onClick={() => document.getElementById("createTask").close()}
+                >
+                Close
+                </button>
+
               </div>
-            </form>
+            </Form>
+            </Formik>
           </div>
         </div>
       </dialog>
@@ -251,63 +251,117 @@ const MyTasks = () => {
       {/* modal to update a task */}
       <dialog id="updateTask" className="modal">
         <div className="modal-box">
-          <form key={updatingTask?.id} onSubmit={handleUpdateTask} className="space-y-7">
+          <Formik enableReinitialize
+                  initialValues={{
+                    taskName: updatingTask?.taskName || "",
+                    taskPriority: updatingTask?.priority || "",
+                    taskDeadline: updatingTask?.deadline || ""
+                  }}
 
-            <label className="text-yellow-100 text-xl lg:text-2xl font-bold">
-              Task Name
-            </label>
-            
-            <input
-              type="text"
-              name="taskName"
-              defaultValue={updatingTask?.taskName}
-              className="input input-bordered w-full mt-3"
-            />
+            validate={(values)=>{
+              const errors = {};
 
-            <label className="text-yellow-100 text-xl lg:text-2xl font-bold">
-              Task Priority
-            </label>
+              if(!values.taskName){
+                errors.taskName = "Name of the Task is nessacary"
+              }
 
-            <select
-              name="taskPriority"
-              defaultValue={updatingTask?.priority}
-              className="select select-bordered w-full mt-3"
+              if(!values.taskPriority){
+                errors.taskPriority = "Setting Task Priority is nessacary"
+              }
+
+              if(!values.taskDeadline){
+                errors.taskDeadline = "Task Deadline is nessacary"
+              }
+
+              return errors;
+            }}
+
+            onSubmit={(values)=>{
+
+              if(
+                values.taskName === updatingTask.taskName &&
+                values.taskPriority === updatingTask.priority &&
+                values.taskDeadline === updatingTask.deadline
+              ){
+                toast.info("No changes made");
+                document.getElementById("updateTask").close();
+                return;
+              }
+
+              const updatedTasks = allTasks.map(task =>
+                task.id === updatingTask.id
+                  ? {
+                      ...task,
+                      taskName: values.taskName,
+                      priority: values.taskPriority,
+                      deadline: values.taskDeadline
+                    }
+                  : task
+              );
+
+              localStorage.setItem("Tasks", JSON.stringify(updatedTasks));
+              setAllTasks(updatedTasks);
+
+              toast.success("Task updated successfully!");
+
+              document.getElementById("updateTask").close();
+            }}
             >
-              <option value="">Select priority</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
 
-            <label className="text-yellow-100 text-xl lg:text-2xl font-bold">
-              Deadline
-            </label>
-
-            <input
-              type="date"
-              name="taskDeadline"
-              defaultValue={updatingTask?.deadline}
-              className="input input-bordered w-full mt-3"
-            />
-
-            <div className="modal-action flex items-center justify-between gap-2 mt-5">
-              <button type="submit" className="btn bg-yellow-100 text-black w-[50%]">
-                Update Task
-              </button>
-
-              <button
-                type="button"
-                className="btn bg-black/50 w-[50%]"
-                onClick={() => document.getElementById("updateTask").close()}
+            <Form className="space-y-7 w-full">
+              <label className="text-yellow-100 text-2xl font-bold">Task Name</label>
+              <Field
+                name="taskName"
+                type="text"
+                placeholder="Enter your task"
+                className="input input-bordered w-full mt-3"
               >
-                Close
-              </button>
-            </div>
+              </Field>
 
-          </form>
+              <ErrorMessage name="taskName" component="div" className="text-red-500 -mt-5"/>
+
+              <label className="text-yellow-100 text-2xl font-bold">Task Priority</label>
+              <Field
+                name="taskPriority"
+                as="select"
+                className="select select-bordered w-full mt-3"
+              >
+                <option value="">Select Priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </Field>
+
+              <ErrorMessage name="taskPriority" component="div" className="text-red-500 -mt-5"/>
+
+              <label className="text-yellow-100 text-2xl font-bold">Task Deadline</label>
+              <Field
+                name="taskDeadline"
+                type="date"
+                className="input input-bordered w-full mt-3"
+              >
+              </Field>
+
+              <ErrorMessage name="taskDeadline" component="div" className="text-red-500 -mt-5"/>
+
+              <div className="modal-action flex gap-2">
+
+                <button type="submit" className="btn bg-yellow-100 text-black w-[50%]">Add Task</button>
+
+                <button
+                  type="button"
+                  className="btn bg-yellow-100 text-black w-[50%]"
+                  onClick={() => document.getElementById("createTask").close()}
+                >
+                Close
+                </button>
+
+              </div>
+            </Form>
+          </Formik>
         </div>
       </dialog>
-    </div>
+  </div>
   );
 }
 
