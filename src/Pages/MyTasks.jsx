@@ -351,7 +351,7 @@ const MyTasks = () => {
                 <button
                   type="button"
                   className="btn bg-yellow-100 text-black w-[50%]"
-                  onClick={() => document.getElementById("createTask").close()}
+                  onClick={() => document.getElementById("updateTask").close()}
                 >
                 Close
                 </button>

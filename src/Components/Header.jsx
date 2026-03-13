@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router';
-import siteLogo from '../../public/to-doIcon.png'
+import siteLogo from '../assets/to-doIcon.png'
 
 export const Header = () => {
   return (
