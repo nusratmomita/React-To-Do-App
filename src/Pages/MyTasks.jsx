@@ -15,6 +15,9 @@ const MyTasks = () => {
   // to update a task
   const [updatingTask,setUpdatingTask] = useState(null);
 
+  // for sorting
+  const [deadlineSorting,setDeadlineSorting] = useState(null);
+
   useEffect(()=>{
     const storedTasks = getTaskFromLS();
 
@@ -54,6 +57,19 @@ const MyTasks = () => {
 
   }
 
+  const sortTasks = [...allTasks].sort((a,b) => {
+
+    if(deadlineSorting === 'earliest'){
+      return new Date(a.deadline) - new Date(b.deadline);
+    }
+
+    if(deadlineSorting === 'latest'){
+      return new Date(b.deadline) - new Date(a.deadline);
+    }
+
+    return 0;
+  })
+
 
   return (
     <div>
@@ -65,9 +81,21 @@ const MyTasks = () => {
           <FaPlus></FaPlus>
         </div>
       </div>
+      <div className='mt-5'>
+        <label htmlFor="sorting" className='mr-5 text-xl text-amber-50'>Sort By Deadline</label>
+        <select name="sorting" id="Sorting" className='select select-bordered'
+          value={deadlineSorting}
+          onChange={(e) => setDeadlineSorting(e.target.value)}
+        >
+          <option value="default">Default</option>
+          <option value="earliest">Earliest Deadline</option>
+          <option value="latest">Latest Deadline</option>
+        </select>
+      </div>
+
       {/* showing all the tasks */}
       {
-        allTasks.length===0 ?
+        sortTasks.length===0 ?
         <>
           <h3 className="text-center text-xl mt-10">No Tasks Found</h3>
         </>
@@ -87,7 +115,7 @@ const MyTasks = () => {
             </thead>
             <tbody>
                 {
-                  allTasks.map((task,index) => (
+                  sortTasks.map((task,index) => (
                   <tr key={task.id}>
                     <td className='text-lg text-center'>{index+1}</td>
                     <td className='text-lg text-center whitespace-nowrap'>{task.taskName}</td>
