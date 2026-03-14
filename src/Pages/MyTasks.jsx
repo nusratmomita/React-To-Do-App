@@ -73,17 +73,17 @@ const MyTasks = () => {
 
   return (
     <div>
-      <div className='flex justify-between items-center mt-10'>
-        <h3 className=" text-amber-100 text-2xl font-bold">My Tasks: {allTasks.length}</h3>
+      <div className='flex justify-between items-center mt-10 mx-3 lg:mx-5'>
+        <h3 className=" text-amber-100 text-xl lg:text-2xl font-bold">My Tasks: {allTasks.length}</h3>
         <div onClick={()=>document.getElementById('createTask').showModal()}
-          className='flex items-center gap-2 border-2 border-amber-100 rounded-xl p-3 text-amber-100 font-medium hover:bg-yellow-100 hover:text-black cursor-pointer transition-all duration-200 mx-3'>
+          className='flex items-center gap-2 border-2 border-amber-100 rounded-xl p-1 lg:p-3 text-amber-100 font-medium hover:bg-yellow-100 hover:text-black cursor-pointer transition-all duration-200'>
           <h4>Add Task</h4>
           <FaPlus></FaPlus>
         </div>
       </div>
-      <div className='mt-5'>
-        <label htmlFor="sorting" className='mr-5 text-xl text-amber-50'>Sort By Deadline</label>
-        <select name="sorting" id="Sorting" className='select select-bordered'
+      <div className='mt-5 mx-3 lg:mx-5'>
+        <label htmlFor="sorting" className='mr-5 text-md lg:text-xl text-amber-50'>Sort By Deadline</label>
+        <select name="sorting" id="Sorting" className='select select-bordered mt-2 md:mt-0 lg:mt-0'
           value={deadlineSorting}
           onChange={(e) => setDeadlineSorting(e.target.value)}
         >
@@ -101,7 +101,7 @@ const MyTasks = () => {
         </>
         :
         <>
-          <div className='overflow-x-auto mx-5 lg:mx-0'>
+          <div className='overflow-x-auto mx-5 lg:mx-5'>
               <table className="table w-full table-zebra mt-15 border border-gray-50 rounded-sm p-5">
             <thead>
               <tr>
@@ -119,11 +119,11 @@ const MyTasks = () => {
                   <tr key={task.id}>
                     <td className='text-lg text-center'>{index+1}</td>
                     <td className='text-lg text-center whitespace-nowrap'>{task.taskName}</td>
-                    <td className='text-lg text-center whitespace-nowrap capitalize'>
+                    <td className='text-md lg:text-lg text-center whitespace-nowrap capitalize'>
                     <span className={`px-3 py-1 border rounded-2xl
-                        ${task.priority === "high" && "text-green-700 border-green-700 bg-green-200"}
+                        ${task.priority === "high" && "text-red-700 border-red-700 bg-red-200"}
                         ${task.priority === "medium" && "text-yellow-700 border-yellow-700 bg-yellow-200"}
-                        ${task.priority === "low" && "text-red-700 border-red-700 bg-red-200"}
+                        ${task.priority === "low" && "text-green-700 border-green-700 bg-green-200"}
                       `}>
                         {task.priority}
                     </span>
@@ -172,6 +172,20 @@ const MyTasks = () => {
                 errors.taskName = "Task name is necessary"
               }
 
+              const newTask = {
+                id: Date.now(),
+                taskName: values.taskName,
+                priority: values.taskPriority,
+                deadline: values.taskDeadline,
+                createdAt: new Date().toISOString().split("T")[0]
+              }
+
+              const addedTask = addTaskToLS(newTask);
+
+              if(!addedTask){
+                errors.taskName = "You already added this Task";
+              }
+
               if(!values.taskPriority){
                 errors.taskPriority = "Task priority is necessary"
               }
@@ -180,20 +194,19 @@ const MyTasks = () => {
                 errors.taskDeadline = "Task Deadline is nessacary"
               }
 
-              return errors;
-            }}
-
-            onSubmit={(values, {resetForm})=>{
-
               const createdAt = new Date().toISOString().split("T")[0];
 
               const deadlineDate = new Date(values.taskDeadline);
               const createdDate = new Date(createdAt);
 
               if (deadlineDate < createdDate) {
-                toast.error("Deadline must be in the future");
-                return;
+                errors.taskDeadline = "Deadline must be in the future";
               }
+
+              return errors;
+            }}
+
+            onSubmit={(values, {resetForm})=>{
 
               const newTask = {
                 id: Date.now(),
@@ -206,7 +219,6 @@ const MyTasks = () => {
               const addedTask = addTaskToLS(newTask);
 
               if(!addedTask){
-                toast.error("You already added this Task");
                 return;
               }
 
@@ -301,6 +313,15 @@ const MyTasks = () => {
                 errors.taskDeadline = "Task Deadline is nessacary"
               }
 
+              const createdAt = new Date().toISOString().split("T")[0];
+
+              const deadlineDate = new Date(values.taskDeadline);
+              const createdDate = new Date(createdAt);
+
+              if (deadlineDate < createdDate) {
+                errors.taskDeadline = "Deadline must be in the future";
+              }
+
               return errors;
             }}
 
@@ -311,7 +332,7 @@ const MyTasks = () => {
                 values.taskPriority === updatingTask.priority &&
                 values.taskDeadline === updatingTask.deadline
               ){
-                toast.info("No changes made");
+                toast.info("No changes were made");
                 document.getElementById("updateTask").close();
                 return;
               }
@@ -374,7 +395,7 @@ const MyTasks = () => {
 
               <div className="modal-action flex gap-2">
 
-                <button type="submit" className="btn bg-yellow-100 text-black w-[50%]">Add Task</button>
+                <button type="submit" className="btn bg-yellow-100 text-black w-[50%]">Update Task</button>
 
                 <button
                   type="button"

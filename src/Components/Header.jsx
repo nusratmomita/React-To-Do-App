@@ -21,7 +21,7 @@ export const Header = () => {
             <div>
                 <img className='w-12 h-12' src={siteLogo} alt="siteLogo" />
             </div>
-            <a href="#" className="text-2xl text-amber-100 hover:bg-transparent lobster-two-regular">Task-Mastrr</a>
+            <a href="#" className="text-2xl text-amber-100 hover:bg-transparent lobster-two-regular whitespace-nowrap">Task-Mastrr</a>
         </div>
         <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal ">
